@@ -1,0 +1,166 @@
+getgenv().autoTap = false
+getgenv().autoRebirth = false
+getgenv().buyEgg = false
+
+local remotePath = game:GetService("ReplicatedStorage").Remotes
+
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
+
+
+local Window = Rayfield:CreateWindow({
+	Name = "Tapping Legends X by Nv",
+	LoadingTitle = "Tapping Legends X ",
+	LoadingSubtitle = "by Nv",
+	ConfigurationSaving = {
+		Enabled = true,
+		FolderName = Farming, -- Create a custom folder for your hub/game
+		FileName = "Big Hub"
+	},
+        Discord = {
+        	Enabled = false,
+        	Invite = "rVeGugG2", -- The Discord invite code, do not include discord.gg/
+        	RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+        },
+	
+})
+local Tab = Window:CreateTab("Farming", 4483362458)
+
+
+
+
+local Section = Tab:CreateSection("Tapping")
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Tap",
+	CurrentValue = false,
+	Flag = "Auto Tap", 
+	Callback = function(Value)
+		getgenv().autoTap = Value
+        if Value then
+        doTap()
+	end
+end
+})
+
+local Section = Tab:CreateSection("Rebirths")
+
+
+local mytable = {}
+
+local first_part_of_dropdown_text = "Rebirth: "
+for i=1,58 do
+  local textbuffer = first_part_of_dropdown_text..i --idealy just put this into the "table.insert" function where textbuffer is
+  table.insert(mytable,textbuffer)
+end
+
+local rebirthoptions = "iagree"
+Tab:CreateDropdown({
+    Name = "Rebirths Options",
+    Options = mytable,
+    CurrentOption = "",
+    Flag = "Rebirth Options",
+    Callback = function(Option)
+        local text = Option
+        text = string.gsub(text,"%D","")
+        text = tonumber(text)
+        rebirthoptions = text
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Rebirth",
+	CurrentValue = false,
+	Flag = "Auto Rebirth", 
+	Callback = function(Value)
+		getgenv().autoRebirth = Value
+        if Value then
+            autoRebirth(rebirthoptions)
+        end
+	end
+})
+
+local Section = Tab:CreateSection("Egg")
+
+
+local eggtable = {}
+
+for _,v in pairs(game.Workspace.Eggs:GetChildren()) do
+  table.insert(eggtable,v.Name)
+end
+
+local eggtoopen = "iagree"
+Tab:CreateDropdown({
+    Name = "Egg to Open",
+    Options = eggtable,
+    CurrentOption = "",
+    Flag = "Egg to open",
+    Callback = function(Option)
+        eggtoopen = Option
+    end,
+})
+
+local Toggle = Tab:CreateToggle({
+	Name = "Auto Buy Egg",
+	CurrentValue = false,
+	Flag = "Auto Egg", 
+	Callback = function(Value)
+        getgenv().buyegg = Value
+        if Value then
+            buyegg(eggtoopen)
+        end
+	end
+})
+
+
+
+
+
+
+
+
+
+function doTap()
+    spawn(function()
+        while getgenv().autoTap == true do
+            game:GetService("ReplicatedStorage").Remotes.Tap:FireServer()
+            wait()
+        end 
+    end)
+end
+
+function autoRebirth(i)
+    spawn(function()
+        while getgenv().autoRebirth == true do
+        
+            local args = {
+              [1] = i,
+            }
+            game:GetService("ReplicatedStorage").Remotes.Rebirth:FireServer(unpack(args))
+
+            wait()
+        end
+    end)
+end
+
+function buyegg(v)
+    spawn(function()
+        while wait(0.3) and getgenv().buyegg do 
+
+        local args = {
+        [1] = v,
+         [2] = 4
+        }
+
+        game:GetService("ReplicatedStorage").Remotes.BuyEgg:InvokeServer(unpack(args))
+
+
+            --imo game.ReplicatedStorage.Remotes.BuyEgg:InvokeServer(v,3) is better as unpack just turns the list into a tuple
+        end
+    end)
+end
+
+    
+ 
+
+
+doTap()
+autoRebirth()
